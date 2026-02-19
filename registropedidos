@@ -1,0 +1,69 @@
+def registrar_pedido(**kwargs):
+    return {
+        "nombre": kwargs["nombre"],
+        "direccion": kwargs["direccion"],
+        "telefono": kwargs["telefono"]
+    }
+
+
+def motor_rutas(distancia, mapa_rutas):
+    return mapa_rutas[distancia]
+
+
+
+def asignar_repartidor(zona, repartidores):
+    return repartidores[zona]
+
+
+
+def calcular_tarifa(zona, tarifas):
+    return tarifas[zona]
+
+
+
+def procesar_envio(distancia, mapa_rutas, repartidores, tarifas, **cliente):
+    pedido = registrar_pedido(**cliente)
+    zona = motor_rutas(distancia, mapa_rutas)
+    repartidor = asignar_repartidor(zona, repartidores)
+    tarifa = calcular_tarifa(zona, tarifas)
+
+    return {
+        "pedido": pedido,
+        "zona": zona,
+        "distancia": distancia,
+        "repartidor": repartidor,
+        "tarifa": tarifa
+    }
+
+
+mapa_rutas = {
+    10: "Marbella",
+    15: "Torices",
+    30: "Bocagrande"
+}
+
+repartidores = {
+    "Marbella": "Roy",
+    "Torices": "Bleider",
+    "Bocagrande": "Daniela"
+}
+
+tarifas = {
+    "Marbella": 10000,
+    "Torices": 25000,
+    "Bocagrande": 70000
+}
+
+
+resultado = procesar_envio(
+    15,
+    mapa_rutas,
+    repartidores,
+    tarifas,
+    nombre="Carlos",
+    direccion="Calle 10",
+    telefono="3001234567"
+)
+
+
+
