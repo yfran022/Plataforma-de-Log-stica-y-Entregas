@@ -1,60 +1,108 @@
 import os
 os.system("cls")
 
-def envios(nombre, direccion, telefono):
-    return nombre, direccion, telefono
+def registrar_pedido(cliente, direccion="No especificada", telefono="No registrado", **kwargs):
+    pedido = {
+        "cliente": cliente,
+        "direccion": direccion,
+        "telefono": telefono
+    }
+    pedido.update(kwargs)
+    return pedido
 
-nombre    = input("Ingrese su nombre para realizar el pedido: ")
-direccion = input("Ingrese su dirección para realizar el pedido: ")
-telefono  = input("Ingrese su teléfono para realizar el pedido: ")
+def motor_rutas(*args):
+    zonas = {
+        "marbella": {"km": 10, "precio": 10000},
+        "torices": {"km": 15, "precio": 25000},
+        "bicentenario": {"km": 30, "precio": 70000}
+    }
 
-info_envio = envios(nombre, direccion, telefono)
+    resultado = {}
 
-print(f"\nCliente: {info_envio[0]} | Dirección: {info_envio[1]} | Teléfono: {info_envio[2]}")
+    for zona in args:
+        if zona in zonas:
+            resultado[zona] = zonas[zona]
 
-
-def rutas(barrio, km):
-    return barrio, km
-
-barrio            = ["Marbella", "Torices",  "Biatona"]
-km                = [10,          15,         30]
-nombre_repartidor = ["sara",      "jorge",      "juan"]
-
-print("\nSeleccione el barrio:")
-print("0. Marbella - 10 km")
-print("1. Torices  - 15 km")
-print("2. Biatona  - 30 km")
-
-selectbarrio = int(input("Escoge el número del barrio: "))
-
-info_ruta = rutas(barrio[selectbarrio], km[selectbarrio])
-
-print(f"Barrio seleccionado: {info_ruta[0]} | Distancia: {info_ruta[1]} km")
+    return resultado
 
 
+def asignar_repartidor(zona, **kwargs):
+    trabajadores = {
+        "yudis": ["marbella"],
+        "jose": ["torices"],
+        "gabriela": ["bicentenario"],
+        "sara": ["marbella", "torices"]
+    }
 
-def tarifas(km):
-    tarifa_base   = 1000
-    precio_por_km = 1000
-    total = tarifa_base + (km * precio_por_km)
-    return total
+    for nombre, zonas in trabajadores.items():
+        if zona in zonas:
+            return nombre
 
-total_pagar = tarifas(info_ruta[1])
-
-print(f"Tarifa del envío: ${total_pagar}")
-
-
-def repartidores(ruta, nombre):
-    return ruta, nombre
-
-info_repartidor = repartidores(barrio[selectbarrio], nombre_repartidor[selectbarrio])
-
-print(f"Repartidor asignado: {info_repartidor[1]} | Ruta: {info_repartidor[0]}")
+    return "No disponible"
 
 
-print("\n SmartDelivery ")
-print(f"Cliente:    {info_envio[0]}")
-print(f"Barrio:     {info_ruta[0]}")
-print(f"Distancia:  {info_ruta[1]} km")
-print(f"Total:      ${total_pagar}")
-print(f"Repartidor: {info_repartidor[1]}")
+
+def calcular_tarifa(precio_producto=0, valor_envio=0):
+    return precio_producto + valor_envio
+
+
+
+cliente = input("Nombre del cliente: ")
+direccion = input("Dirección: ")
+telefono = input("Teléfono: ")
+
+print("\nSeleccione la zona:")
+print("1. Marbella - 10 km - $10000")
+print("2. Torices  - 15 km - $25000")
+print("3. bicentenario  - 30 km - $70000")
+
+try:
+    opcion = int(input("Ingrese el número de la zona: "))
+except ValueError:
+    print("Entrada inválida. Por favor ingrese un número.")
+    exit()
+
+zonas_lista = ["marbella", "torices", "bicentenario"]
+
+if opcion in [1, 2, 3]:
+    zona = zonas_lista[opcion - 1]
+else:
+    print("Opción inválida")
+    exit()
+
+producto = input("Producto: ")
+precio_producto = float(input("Precio del producto: "))
+
+# Registro del pedido
+pedido = registrar_pedido(cliente, direccion=direccion, telefono=telefono)
+
+# Motor de rutas
+datos_ruta = motor_rutas(zona)
+
+if zona in datos_ruta:
+    valor_envio = datos_ruta[zona]["precio"]
+    km = datos_ruta[zona]["km"]
+else:
+    valor_envio = 0
+    km = 0
+
+# Asignación de repartidor
+repartidor = asignar_repartidor(zona)
+
+# Desempaquetado para cálculo
+datos_pago = {
+    "precio_producto": precio_producto,
+    "valor_envio": valor_envio
+}
+
+total_pagar = calcular_tarifa(**datos_pago)
+
+print("\n===== SmartDelivery =====")
+print(f"Cliente: {pedido['cliente']}")
+print(f"Dirección: {pedido['direccion']}")
+print(f"Teléfono: {pedido['telefono']}")
+print(f"Zona: {zona}")
+print(f"Distancia: {km} km")
+print(f"Valor envío: ${valor_envio}")
+print(f"Repartidor asignado: {repartidor}")
+print(f"Total a pagar: ${total_pagar}")
